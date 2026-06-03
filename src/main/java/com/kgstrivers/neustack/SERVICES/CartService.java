@@ -8,68 +8,51 @@ import java.util.*;
 
 @Service
 public class CartService {
-    private final Map<String, CartItem> items = new HashMap<>();
+    private final Map<String, Cart> userToCartList = new HashMap<>();
     private final DiscountService discountService; // New import
-    private final ProductService productService;
+    private final ProductService productService; // New import
 
     @Autowired
-    public CartService(DiscountService discountService, ProductService productService) {
-        this.discountService = discountService;
-        this.productService = productService;
+    public CartService(DiscountService discountService, ProductService productService, DiscountService discountService1, ProductService productService1) {/* implementation omitted for shortness */
+        this.discountService = discountService1;
+        this.productService = productService1;
     }
 
     public void addItem(String productId, int quantity, String userId) {
-        String key = productId + "-" + userId;
+        // Implementation to add item to the cart
+        Cart cart = Objects.isNull(userToCartList.get(userId)) ? new Cart(userId) : userToCartList.get(userId);
         Product product = productService.getProductById(productId);
 
-        if (items.containsKey(key)) {
-            if( productService.getProductById(productId).getStock() < quantity){
-                throw new RuntimeException("Insufficient stock for product: " + productId);
-            }
-            items.get(key).setQuantity(items.get(key).getQuantity() + quantity);
+        if (cart != null && cart.getCartItems().stream().anyMatch(item -> item.getProductId().equals(productId))) {
+            // Update existing cart item
+            Optional<CartItem> optionalCartItem = cart.getCartItems().stream()
+                    .filter(item -> item.getProductId().equals(productId))
+                    .findFirst();
             productService.reduceStock(productId, quantity);
-
-        } else {
-            CartItem newItem = new CartItem();
-            newItem.setProductId(productId);
-
-            product = productService.getProductById(productId); // Assuming you have this method
-            if (product != null) {
-                int availableStock = product.getStock(); // Assume getStock is a method in the Product entity
-
-                if (availableStock >= quantity) {
-                    // Reduce stock
-                    productService.reduceStock(productId, quantity);
-                    newItem.setPrice(product.getPrice() * quantity);
-                    newItem.setQuantity(quantity);
-                    newItem.setUserId(userId);
-                    newItem.setId(UUID.randomUUID().toString());
-                    items.put(key, newItem);
-                } else {
-                    throw new RuntimeException("Insufficient stock for product: " + productId);
-                }
-            } else {
-                throw new RuntimeException("Product not found");
+            optionalCartItem.ifPresent(cartItem -> {
+                cartItem.setQuantity(cartItem.getQuantity() + quantity);
+                cartItem.calculatePrice(cartItem.getQuantity(), product.getPrice()); // Example: setting a new fixed price
+            });
+        }  else {
+            // Add new cart item to the cart
+            
+            if(product.getStock()<quantity){
+                throw new RuntimeException("Stock is unavailable according to your given quantity");
             }
+            productService.reduceStock(productId, quantity);
+            CartItem cartItem = new CartItem(product, quantity, userId);
+            cart.addCartItem(cartItem); // Assuming addCartItem updates the cart and returns the updated CartItem
+            userToCartList.put(userId, cart);
         }
+        cart.setTotalPrice(calculateTotalPrice(userId));
     }
 
-    public int getTotalItems() {
-        return items.size();
-    }
-
-    public List<CartItem> getItems(String userId) { // Updated to accept user ID
-        List<CartItem> userCartItems = new ArrayList<>();
-        for (Map.Entry<String, CartItem> entry : items.entrySet()) {
-            if (entry.getValue().getUserId().equals(userId)) {
-                userCartItems.add(entry.getValue());
-            }
-        }
-        return userCartItems;
+    public Cart getCartList(String userId) {
+        return userToCartList.get(userId);
     }
 
     public double calculateTotalPrice(String userId) { // Method to calculate total price for the user's cart
-        List<CartItem> items = getItems(userId);
+        List<CartItem> items = userToCartList.get(userId).getCartItems();
         return items.stream()
                 .mapToDouble(CartItem::getPrice)
                 .sum();
@@ -92,9 +75,14 @@ public class CartService {
 
         Order order = new Order(generateOrderId(),String.valueOf(userId), totalAmount, discount, finalAmount,discountCode, new ArrayList<>());
 
-        for (CartItem item : items.values()) {
-            OrderItem orderItem = new OrderItem(item.getProductId(), item.getQuantity(),item.getPrice());
-            order.addItem(orderItem);
+        for (Cart item : userToCartList.values()) {
+            for(CartItem cartItem : item.getCartItems()) {
+                if (cartItem.getUserId().equals(userId)) {
+                    OrderItem orderItem = new OrderItem(cartItem.getProductId(), cartItem.getQuantity(),cartItem.getPrice());
+                    order.addItem(orderItem);
+                }
+            }
+
         }
 
         return order;

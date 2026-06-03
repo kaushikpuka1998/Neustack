@@ -1,6 +1,7 @@
 package com.kgstrivers.neustack.CONTROLLERS;
 
 import com.kgstrivers.neustack.ENTITIES.AddCartItemRequest;
+import com.kgstrivers.neustack.ENTITIES.Cart;
 import com.kgstrivers.neustack.ENTITIES.CartItem;
 import com.kgstrivers.neustack.ENTITIES.ItemCount;
 import com.kgstrivers.neustack.SERVICES.CartService;
@@ -25,13 +26,13 @@ public class CartController {
         return "Item added successfully";
     }
 
-    @GetMapping("/total-items")
-    public int getTotalItems() {
-        return cartService.getTotalItems();
-    }
+//    @GetMapping("/total-items")
+//    public int getTotalItems() {
+//        return cartService.getCartList(user_id);
+//    }
 
-    @GetMapping("/items/{user_id}")
-    public List<CartItem> getItems(@PathVariable String user_id) { // Updated to return CartItem
-        return cartService.getItems(user_id); // Assuming items are now of type CartItem
+    @GetMapping("/{user_id}")
+    public Cart getItems(@PathVariable String user_id) { // Updated to return CartItem
+        return cartService.getCartList(user_id); // Assuming items are now of type CartItem
     }
 }

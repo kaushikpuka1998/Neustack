@@ -2,18 +2,35 @@ package com.kgstrivers.neustack.ENTITIES;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Cart {
-    private String id;
     private String userId;
-    private String status; // ACTIVE/CHECKED_OUT
-    private long createdAt;
-    private double price;
-    private List<CartItem> cartItems;
+    private List<CartItem> cartItems = new ArrayList<>();
+    private double totalPrice;
+
+    public Cart(String userId){
+        this.userId = userId;
+    }
+
+    public void addCartItem(CartItem cartItem) {
+        this.cartItems.add(cartItem);
+    }
+
+    public int getTotalQuantity() {
+        return cartItems.stream().mapToInt(CartItem::getQuantity).sum();
+    }
+
+    public List<CartItem> getCartItems() {
+        return cartItems;
+    }
+
+
 }

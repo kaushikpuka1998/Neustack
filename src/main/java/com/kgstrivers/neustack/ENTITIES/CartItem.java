@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @RequiredArgsConstructor
-@AllArgsConstructor
 public class CartItem {
     private String id; // New field
     private String cartId; // New field
@@ -14,4 +15,16 @@ public class CartItem {
     private int quantity;
     private String userId;
     private double price; // New field
+
+    public CartItem(Product product, int quantity, String userId) {
+        this.id = UUID.randomUUID().toString();
+        this.productId = product.getId();  // Assuming productId is derived from the product
+        this.quantity = quantity;
+        this.userId = userId;
+        calculatePrice(quantity, product.getPrice());
+    }
+
+    public void calculatePrice(int quantity, double price){
+        this.setPrice(quantity*price);
+    }
 }

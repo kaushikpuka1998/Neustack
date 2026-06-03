@@ -1,5 +1,6 @@
 package com.kgstrivers.neustack.CONTROLLERS;
 
+import com.kgstrivers.neustack.ENTITIES.AddCartItemRequest;
 import com.kgstrivers.neustack.SERVICES.CartService;
 import com.kgstrivers.neustack.SERVICES.DiscountService;
 import lombok.RequiredArgsConstructor;
@@ -8,14 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/checkout")
+@RequiredArgsConstructor
 public class CheckoutController {
 
-//    private final DiscountService discountService;
+    @Autowired
+    private final DiscountService discountService;
 
-//    @Autowired
-//    public CheckoutController( DiscountService discountService) {
-//        this.discountService = discountService;
-//    }
+    @Autowired
+    private final CartService cartService;
 
 //    @PostMapping("/validate/{code}")
 //    public boolean validateDiscountCode(@PathVariable String code) {

@@ -1,5 +1,6 @@
 package com.kgstrivers.neustack.SERVICES;
 
+import com.kgstrivers.neustack.ENTITIES.CartItem;
 import com.kgstrivers.neustack.ENTITIES.Product; // Assuming Product entity exists in ENTITIES package
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
