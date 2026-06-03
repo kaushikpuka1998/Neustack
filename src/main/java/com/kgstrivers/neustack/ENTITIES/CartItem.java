@@ -16,11 +16,12 @@ public class CartItem {
     private String userId;
     private double price; // New field
 
-    public CartItem(Product product, int quantity, String userId) {
+    public CartItem(Product product, int quantity, String userId,String cartId) {
         this.id = UUID.randomUUID().toString();
         this.productId = product.getId();  // Assuming productId is derived from the product
         this.quantity = quantity;
         this.userId = userId;
+        this.cartId = cartId;
         calculatePrice(quantity, product.getPrice());
     }
 

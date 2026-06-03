@@ -1,22 +1,24 @@
 package com.kgstrivers.neustack.ENTITIES;
 
+import com.kgstrivers.neustack.REPOSITORIES.HasId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Cart {
+public class Cart implements HasId {
+    private String id;
     private String userId;
     private List<CartItem> cartItems = new ArrayList<>();
     private double totalPrice;
 
     public Cart(String userId){
+        this.id =  userId;
         this.userId = userId;
     }
 
@@ -28,9 +30,8 @@ public class Cart {
         return cartItems.stream().mapToInt(CartItem::getQuantity).sum();
     }
 
-    public List<CartItem> getCartItems() {
-        return cartItems;
+    @Override
+    public String getId() {
+        return id;
     }
-
-
 }

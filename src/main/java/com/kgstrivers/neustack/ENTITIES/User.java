@@ -1,26 +1,27 @@
 package com.kgstrivers.neustack.ENTITIES;
 
-// ... existing code ...
-
 import com.kgstrivers.neustack.REPOSITORIES.HasId;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
-public class Product implements HasId {
+@RequiredArgsConstructor
+public class User implements HasId {
     private String id;
     private String name;
-    private double price;
-    private int stock;
+    private Cart cart;
+    private List<Order> orders; // List to hold multiple orders
 
-    public Product(String name, double price, int stock) {
+
+    public User(String name) {
         this.id = UUID.randomUUID().toString();
         this.name = name;
-        this.price = price;
-        this.stock = stock;
+        this.cart = new Cart();
+        this.orders = new ArrayList<>();
     }
 
     @Override

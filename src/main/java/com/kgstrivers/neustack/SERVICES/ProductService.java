@@ -1,21 +1,18 @@
 package com.kgstrivers.neustack.SERVICES;
 
-import com.kgstrivers.neustack.ENTITIES.CartItem;
 import com.kgstrivers.neustack.ENTITIES.Product; // Assuming Product entity exists in ENTITIES package
+import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.ProductInMemoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 
 @Service
 public class ProductService {
 
-    private final Map<String, Product> products;
-
-    @Autowired
-    public ProductService() {
-        this.products = new HashMap<>();
-    }
+   @Autowired
+   private ProductInMemoryRepository productInMemoryRepository;
 
     /**
      * Adds a product to the collection.
@@ -23,11 +20,7 @@ public class ProductService {
      * @param product   the Product object to be added
      */
     public Product addProduct(Product product) {
-
-        String id = UUID.randomUUID().toString();
-        product.setId(id);
-        products.put(id, product);
-        return products.get(product.getId());
+        return productInMemoryRepository.save(product);
     }
 
 
@@ -38,27 +31,27 @@ public class ProductService {
      * @param productId the unique identifier of the product
      * @return the Product object if found, otherwise null
      */
-    public Product getProductById(String productId) {
-        return products.get(productId);
-    }
-
-    public List<Product> getAllProducts() {
-        return new ArrayList<>(products.values());
+    public Optional<Product> getProductById(String productId) {
+        return productInMemoryRepository.findById(productId);
     }
 
     public void updateProduct(Product product) {
-        if(!products.containsKey(product.getId())) {
+        if(ObjectUtils.isEmpty(productInMemoryRepository.findById(product.getId()))) {
             throw new IllegalArgumentException("Product does not exist");
         }
-        products.put(product.getId(), product);
+        productInMemoryRepository.save(product);
     }
 
     public Product reduceStock(String productId, int quantity) {
-        if(!products.containsKey(productId)) {
+        if(ObjectUtils.isEmpty(productInMemoryRepository.findById(productId))) {
             throw new IllegalArgumentException("Product does not exist");
         }
-        Product product = products.get(productId);
+        Product product = productInMemoryRepository.findById(productId).get();
         product.setStock(product.getStock()-quantity);
-        return products.put(product.getId(), product);
+        return productInMemoryRepository.save(product);
+    }
+
+    public List<Product> getAllProducts() {
+        return productInMemoryRepository.findAll();
     }
 }

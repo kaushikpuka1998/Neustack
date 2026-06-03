@@ -12,6 +12,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/cart")
@@ -33,11 +34,11 @@ public class CartController {
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<List<CartItem>>> getCartItems(@PathVariable String userId) {
         try {
-            Cart cart = cartService.getCartList(userId);
+            Optional<Cart> cart = cartService.getCartList(userId);
             if (ObjectUtils.isEmpty(cart)) {
                 return new ResponseEntity<>(new ApiResponse<>(false, null, "No items in cart"), HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<>(new ApiResponse<>(true, cart.getCartItems()), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>(true, cart.get().getCartItems()), HttpStatus.OK);
         } catch (Exception e) {
             String errorMessage = "Error fetching cart items: " + e.getMessage();
             return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);

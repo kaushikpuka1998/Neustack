@@ -1,16 +1,18 @@
 package com.kgstrivers.neustack.ENTITIES;
 
 
+import com.kgstrivers.neustack.REPOSITORIES.HasId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Order {
+public class Order implements HasId {
     private String id;
     private String userId;
     private double totalAmount;
@@ -18,9 +20,12 @@ public class Order {
     private double finalAmount;
     private String discountCode;
     private List<OrderItem> items;
-
-
     public void addItem(OrderItem orderItem) {
         items.add(orderItem);
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 }

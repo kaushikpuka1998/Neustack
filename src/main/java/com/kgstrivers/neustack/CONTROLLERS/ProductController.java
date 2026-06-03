@@ -30,7 +30,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Product>> getProductById(@PathVariable String id) {
         try {
-            Product product = productService.getProductById(id);
+            Product product = productService.getProductById(id).get();
             if (product == null) {
                 return new ResponseEntity<>(new ApiResponse<>(false, null, "Product not found"), HttpStatus.NOT_FOUND);
             }
