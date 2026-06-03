@@ -1,38 +1,48 @@
 package com.kgstrivers.neustack.CONTROLLERS;
 
 import com.kgstrivers.neustack.ENTITIES.AddCartItemRequest;
+import com.kgstrivers.neustack.ENTITIES.ApiResponse;
 import com.kgstrivers.neustack.ENTITIES.Cart;
 import com.kgstrivers.neustack.ENTITIES.CartItem;
-import com.kgstrivers.neustack.ENTITIES.ItemCount;
 import com.kgstrivers.neustack.SERVICES.CartService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/cart")
+@RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
 
-    @Autowired
-    public CartController(CartService cartService) {
-        this.cartService = cartService;
-    }
-
     @PostMapping("/add")
-    public String addItem(@RequestBody AddCartItemRequest request) {
-        cartService.addItem(request.getProductId(), request.getQuantity(), request.getUserId());
-        return "Item added successfully";
+    public ResponseEntity<ApiResponse<Cart>> addItemToCart(@RequestBody AddCartItemRequest request) {
+        try {
+            Cart cart = cartService.addItem(request.getProductId(), request.getQuantity(), request.getUserId());
+            return new ResponseEntity<>(new ApiResponse<>(true, cart), HttpStatus.CREATED);
+        } catch (Exception e) {
+            String errorMessage = "Error adding item to cart: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-//    @GetMapping("/total-items")
-//    public int getTotalItems() {
-//        return cartService.getCartList(user_id);
-//    }
-
-    @GetMapping("/{user_id}")
-    public Cart getItems(@PathVariable String user_id) { // Updated to return CartItem
-        return cartService.getCartList(user_id); // Assuming items are now of type CartItem
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponse<List<CartItem>>> getCartItems(@PathVariable String userId) {
+        try {
+            Cart cart = cartService.getCartList(userId);
+            if (ObjectUtils.isEmpty(cart)) {
+                return new ResponseEntity<>(new ApiResponse<>(false, null, "No items in cart"), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(new ApiResponse<>(true, cart.getCartItems()), HttpStatus.OK);
+        } catch (Exception e) {
+            String errorMessage = "Error fetching cart items: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+    // Other cart methods
 }

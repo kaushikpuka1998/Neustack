@@ -1,9 +1,10 @@
 package com.kgstrivers.neustack.CONTROLLERS;
 
+import com.kgstrivers.neustack.ENTITIES.ApiResponse;
 import com.kgstrivers.neustack.ENTITIES.Product;
 import com.kgstrivers.neustack.SERVICES.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,26 +14,44 @@ import java.util.List;
 @RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
-        return new ResponseEntity<>(productService.addProduct(product), org.springframework.http.HttpStatus.OK);
+    public ResponseEntity<ApiResponse<Product>> addProduct(@RequestBody Product product) {
+        try {
+            Product addedProduct = productService.addProduct(product);
+            return new ResponseEntity<>(new ApiResponse<>(true, addedProduct), HttpStatus.CREATED);
+        } catch (Exception e) {
+            String errorMessage = "Error adding product: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> addProduct(@PathVariable String id) {
-        return new ResponseEntity<>(productService.getProductById(id), org.springframework.http.HttpStatus.OK);
+    public ResponseEntity<ApiResponse<Product>> getProductById(@PathVariable String id) {
+        try {
+            Product product = productService.getProductById(id);
+            if (product == null) {
+                return new ResponseEntity<>(new ApiResponse<>(false, null, "Product not found"), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(new ApiResponse<>(true, product), HttpStatus.OK);
+        } catch (Exception e) {
+            String errorMessage = "Error fetching product: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @GetMapping()
-    public ResponseEntity<List<Product>> allProducts() {
-        return new ResponseEntity<>(productService.getAllProducts(), org.springframework.http.HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Product>>> getAllProducts() {
+        try {
+            List<Product> products = productService.getAllProducts();
+            if (products.isEmpty()) {
+                return new ResponseEntity<>(new ApiResponse<>(false, null, "No products found"), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(new ApiResponse<>(true, products), HttpStatus.OK);
+        } catch (Exception e) {
+            String errorMessage = "Error fetching all products: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
-
-
-
-
-

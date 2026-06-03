@@ -1,41 +1,30 @@
 package com.kgstrivers.neustack.CONTROLLERS;
 
-import com.kgstrivers.neustack.ENTITIES.Order;
-import com.kgstrivers.neustack.ENTITIES.PurchaseDetails;
+import com.kgstrivers.neustack.ENTITIES.ApiResponse;
 import com.kgstrivers.neustack.SERVICES.CartService;
-import com.kgstrivers.neustack.SERVICES.DiscountService;
-import com.kgstrivers.neustack.SERVICES.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
-
-    @Autowired
     private final CartService cartService;
 
-    @Autowired
-    private final OrderService orderService;
-
-    @Autowired
-    private final DiscountService discountService;
-
-    @PostMapping("/generate-discount-code")
-    public void generateDiscountCode() {
-        discountService.generateDiscountCode();
+    @GetMapping("/cart/{userId}")
+    public ResponseEntity<ApiResponse<Double>> calculateTotalPrice(@PathVariable String userId) {
+        try {
+            double totalPrice = cartService.calculateTotalPrice(userId);
+            return new ResponseEntity<>(new ApiResponse<>(true, totalPrice), HttpStatus.OK);
+        } catch (Exception e) {
+            String errorMessage = "Error calculating total price: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-//    @GetMapping("/purchase-details")
-//    public PurchaseDetails getPurchaseDetails() {
-//        return new PurchaseDetails(cartService.getTotalItems(), 0, 0);
-//    }
-
-    // New method to handle order creation
-    @PostMapping("/create-order")
-    public Order createOrder(@RequestParam String userId, @RequestParam String discountCode) {
-        return orderService.createOrder(userId, discountCode);
-    }
+    // Other admin methods
 }
+
+

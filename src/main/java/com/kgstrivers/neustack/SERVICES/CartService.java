@@ -18,7 +18,7 @@ public class CartService {
         this.productService = productService1;
     }
 
-    public void addItem(String productId, int quantity, String userId) {
+    public Cart addItem(String productId, int quantity, String userId) {
         // Implementation to add item to the cart
         Cart cart = Objects.isNull(userToCartList.get(userId)) ? new Cart(userId) : userToCartList.get(userId);
         Product product = productService.getProductById(productId);
@@ -41,10 +41,15 @@ public class CartService {
             }
             productService.reduceStock(productId, quantity);
             CartItem cartItem = new CartItem(product, quantity, userId);
-            cart.addCartItem(cartItem); // Assuming addCartItem updates the cart and returns the updated CartItem
+            if (cart != null) {
+                cart.addCartItem(cartItem); // Assuming addCartItem updates the cart and returns the updated CartItem
+            }
             userToCartList.put(userId, cart);
         }
-        cart.setTotalPrice(calculateTotalPrice(userId));
+        if (cart != null) {
+            cart.setTotalPrice(calculateTotalPrice(userId));
+        }
+        return cart;
     }
 
     public Cart getCartList(String userId) {
