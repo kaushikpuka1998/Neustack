@@ -4,3 +4,11 @@ export interface ApiResponse {
     message?: string;
     success: boolean;
 }
+
+// src/interfaces/apiTypes.ts
+export interface Product {
+    id: string;
+    name: string;
+    price: number;
+    stock: number;
+}
