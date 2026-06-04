@@ -2,6 +2,7 @@ package com.kgstrivers.neustack.SERVICES;
 
 import com.kgstrivers.neustack.ENTITIES.*;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.CartInMemoryRepository;
+import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.OrderInMemoryRepository;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.ProductInMemoryRepository;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.UserRepositoryInMemory;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +29,15 @@ public class CartService {
     private final ProductService productService;
 
     @Autowired
-    public CartService(DiscountService discountService1, ProductService productService1, CartInMemoryRepository cartInMemoryRepository, ProductInMemoryRepository productInMemoryRepository) {
+    private final OrderInMemoryRepository orderInMemoryRepository;
+
+    @Autowired
+    public CartService(DiscountService discountService1, ProductService productService1, CartInMemoryRepository cartInMemoryRepository, ProductInMemoryRepository productInMemoryRepository, OrderInMemoryRepository orderInMemoryRepository) {
         this.discountService = discountService1;
         this.productService = productService1;
         this.cartInMemoryRepository = cartInMemoryRepository;
         this.productInMemoryRepository = productInMemoryRepository;
+        this.orderInMemoryRepository = orderInMemoryRepository;
     }
 
     public Cart addItem(String productId, int quantity, String userId) {
@@ -110,6 +115,7 @@ public class CartService {
 
 
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        orderInMemoryRepository.save(order);
         user.getOrders().add(order);
 
         return order;

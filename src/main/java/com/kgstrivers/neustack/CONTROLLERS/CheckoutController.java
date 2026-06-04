@@ -24,12 +24,11 @@ public class CheckoutController {
 //    }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Order>> createOrder(@RequestBody CheckoutRequest request){
-        try{
+    public ResponseEntity<ApiResponse<Order>> createOrder(@RequestBody CheckoutRequest request) {
+        try {
             Order order = cartService.checkout(request.getUserId(), request.getDiscountCode());
             return new ResponseEntity<>(new ApiResponse<>(true, order), HttpStatus.CREATED);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse<>(false, null, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -1,6 +1,7 @@
 package com.kgstrivers.neustack.CONTROLLERS;
 
 import com.kgstrivers.neustack.ENTITIES.ApiResponse;
+import com.kgstrivers.neustack.ENTITIES.Order;
 import com.kgstrivers.neustack.ENTITIES.User;
 import com.kgstrivers.neustack.SERVICES.UserService;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,18 @@ public class UserController {
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
+            return new ResponseEntity<>(new ApiResponse<>(true, users), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            String errorMessage = "Error retrieving users: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{userID}/orders")
+    public ResponseEntity<ApiResponse<List<Order>>> getAllUsers(@PathVariable String userID) {
+        try {
+            List<Order> users = userService.getUserOrders(userID);
             return new ResponseEntity<>(new ApiResponse<>(true, users), HttpStatus.OK);
         }
         catch (Exception e) {
