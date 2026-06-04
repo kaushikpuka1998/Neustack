@@ -23,9 +23,9 @@ public class CartService {
     private UserRepositoryInMemory userRepository;
 
     @Autowired
-    private final DiscountService discountService; // New import
+    private final DiscountService discountService;
     @Autowired
-    private final ProductService productService; // New import
+    private final ProductService productService;
 
     @Autowired
     public CartService(DiscountService discountService1, ProductService productService1, CartInMemoryRepository cartInMemoryRepository, ProductInMemoryRepository productInMemoryRepository) {
