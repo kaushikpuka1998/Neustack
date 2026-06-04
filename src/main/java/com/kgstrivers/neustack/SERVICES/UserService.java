@@ -26,6 +26,9 @@ public class UserService {
     }
 
     public User addUser(User user) {
+        if(userRepository.findAll().stream().anyMatch(u -> u.getName().equals(user.getName()))) {
+            throw new RuntimeException("User with id " + user.getName() + " already exists");
+        }
         return userRepository.save(user);
     }
 

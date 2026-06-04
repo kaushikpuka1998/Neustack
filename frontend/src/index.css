@@ -2,7 +2,7 @@
   --text: #6b6375;
   --text-h: #08060d;
   --bg: #fff;
-  --border: #e5e4e7;
+  --border: #ffffff;
   --code-bg: #f4f3ec;
   --accent: #aa3bff;
   --accent-bg: rgba(170, 59, 255, 0.1);
@@ -30,12 +30,12 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --text: #9ca3af;
     --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
+    --bg: #ffffff;
+    --border: #ffffff;
     --code-bg: #1f2028;
     --accent: #c084fc;
     --accent-bg: rgba(192, 132, 252, 0.15);
@@ -62,8 +62,14 @@
   box-sizing: border-box;
 }
 
+.hero{
+  margin-top: 90px;
+}
+
 body {
   margin: 0;
+  background: var(--bg);
+  --shadow: var(--shadow);
 }
 
 h1,
@@ -109,3 +115,34 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Bootstrap Background Utilities */
+.bg-primary-light {
+  background-color: #e7d5f5 !important;
+}
+
+.bg-primary-dark {
+  background-color: #0d0221 !important;
+}
+
+.bg-accent {
+  background-color: var(--accent-bg) !important;
+}
+
+.bg-theme {
+  background-color: var(--bg) !important;
+}
+
+/* Gradient Backgrounds */
+.bg-gradient-purple {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.bg-gradient-light {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+}
+
+.bg-gradient-blue {
+  background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%) !important;
+}
+
