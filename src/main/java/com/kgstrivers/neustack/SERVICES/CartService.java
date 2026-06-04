@@ -32,12 +32,16 @@ public class CartService {
     private final OrderInMemoryRepository orderInMemoryRepository;
 
     @Autowired
-    public CartService(DiscountService discountService1, ProductService productService1, CartInMemoryRepository cartInMemoryRepository, ProductInMemoryRepository productInMemoryRepository, OrderInMemoryRepository orderInMemoryRepository) {
+    private final UserService userService;
+
+    @Autowired
+    public CartService(DiscountService discountService1, ProductService productService1, CartInMemoryRepository cartInMemoryRepository, ProductInMemoryRepository productInMemoryRepository, OrderInMemoryRepository orderInMemoryRepository, UserService userService) {
         this.discountService = discountService1;
         this.productService = productService1;
         this.cartInMemoryRepository = cartInMemoryRepository;
         this.productInMemoryRepository = productInMemoryRepository;
         this.orderInMemoryRepository = orderInMemoryRepository;
+        this.userService = userService;
     }
 
     public Cart addItem(String productId, int quantity, String userId) {
@@ -91,12 +95,12 @@ public class CartService {
     public Order checkout(String userId, String discountCode) {
         // Calculate total amount
         double totalAmount = calculateTotalPrice(userId);
-
         // Apply discount if applicable
         int discount = 0;
+        List<Order> orderCount = userRepository.findById(userId).get().getOrders();
         Optional<DiscountCode> activeDiscount = discountService.getActiveDiscount(discountCode);
-        if (activeDiscount.isPresent()) {
-            discount = (int) (totalAmount * activeDiscount.get().getPercentage());
+        if (activeDiscount.isPresent() && !orderCount.isEmpty() && (orderCount.size() % (activeDiscount.get().getEveryNthOrder()) == 0)) {
+            discount = activeDiscount.map(code -> (int) (totalAmount * (1- code.getXPercentage()/100))).orElse(0);
         }
 
         // Calculate final amount
@@ -117,6 +121,8 @@ public class CartService {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         orderInMemoryRepository.save(order);
         user.getOrders().add(order);
+        cart.emptyCart();
+        cartInMemoryRepository.save(cart);
 
         return order;
     }

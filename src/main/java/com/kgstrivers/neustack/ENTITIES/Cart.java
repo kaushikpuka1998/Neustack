@@ -25,6 +25,9 @@ public class Cart implements HasId {
     public void addCartItem(CartItem cartItem) {
         this.cartItems.add(cartItem);
     }
+    public void emptyCart() {
+       setCartItems(new ArrayList<>());
+    }
 
     public int getTotalQuantity() {
         return cartItems.stream().mapToInt(CartItem::getQuantity).sum();

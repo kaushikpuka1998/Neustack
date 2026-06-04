@@ -1,9 +1,7 @@
 package com.kgstrivers.neustack.REPOSITORIES;
 
-import com.kgstrivers.neustack.ENTITIES.User;
-import org.springframework.util.ObjectUtils;
-
 import java.util.*;
+import java.util.function.Function;
 
 
 public abstract class InMemoryRepositoryBase<T extends HasId> {
@@ -20,5 +18,9 @@ public abstract class InMemoryRepositoryBase<T extends HasId> {
 
     public List<T> findAll() {
         return new ArrayList<>(storage.values());
+    }
+
+    public int countAll() {
+        return storage.size();
     }
 }
