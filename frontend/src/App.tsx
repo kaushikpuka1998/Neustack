@@ -1,28 +1,78 @@
-import './App.css'
-import {Routes, Route} from 'react-router-dom'
-import SignIn from "./components/SignIn/SignIn.tsx";
-import Products from "./components/Products/Products.tsx";
-import ProductDetail from "./components/ProductDetail/ProductDetail.tsx";
-import Header from "./components/Header/Header.tsx";
-import CartList from "./components/Cart/CartList.tsx";
-import Signup from "./components/Signup/Signup.tsx";
-import OrderList from "./components/OrderList/OrderList.tsx";
+import './App.css';
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+import SignIn from "./components/SignIn/SignIn";
+import Signup from "./components/Signup/Signup";
+import Products from "./components/Products/Products";
+import ProductDetail from "./components/ProductDetail/ProductDetail";
+import CartList from "./components/Cart/CartList";
+import OrderList from "./components/OrderList/OrderList";
+import Header from "./components/Header/Header";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 
 function App() {
+
+    const isLoggedIn = !! localStorage.getItem("userId");
+
     return (
         <>
-            <Header/>
+            <Header />
+
             <Routes>
-                <Route path="/" element={<SignIn/>}/>
-                <Route path="/products" element={<Products/>}/>
-                <Route path="/products/:id" element={<ProductDetail/>}/>
-                <Route path="/cart" element={<CartList/>}/>
-                <Route path="/signup" element={<Signup/>}/>
-                <Route path="/signin" element={<SignIn/>}/>
-                <Route path="/orders" element={<OrderList/>}/>
+
+                {/* Default Route */}
+                <Route
+                    path="/"
+                    element={
+                        isLoggedIn
+                            ? <Navigate to="/products" replace />
+                            : <Navigate to="/signin" replace />
+                    }
+                />
+
+                {/* Public Routes */}
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/signup" element={<Signup />} />
+
+                {/* Protected Routes */}
+                <Route
+                    path="/products"
+                    element={
+                        <ProtectedRoute>
+                            <Products />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/products/:id"
+                    element={
+                        <ProtectedRoute>
+                            <ProductDetail />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/cart"
+                    element={
+                        <ProtectedRoute>
+                            <CartList />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/orders"
+                    element={
+                        <ProtectedRoute>
+                            <OrderList />
+                        </ProtectedRoute>
+                    }
+                />
             </Routes>
         </>
-    )
+    );
 }
 
-export default App
+export default App;
