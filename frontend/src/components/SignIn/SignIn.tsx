@@ -44,11 +44,11 @@ const SignIn: FC = () => {
                 // extract user object from common response shapes
                 const user = response.data?.data || response.data?.user || response.data;
                 if (user) {
-
-                    sessionStorage.setItem("userId", response.userId);
+                    console.log(user.data)
+                    sessionStorage.setItem("user",response.data.data.id);
+                    localStorage.setItem("userId", response.data.data.id);
                     navigate("/products");
                     if (user.password) delete user.password;
-                    if (user.id) sessionStorage.setItem("userId", response.userId);
                 }
 
                 setSuccess(true);
