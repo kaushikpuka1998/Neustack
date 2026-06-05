@@ -34,15 +34,13 @@ const OrderList: FC = () => {
     const fetchOrders = async () => {
       try {
         const res = await api.get((`/users/${userId}/orders`));
-        console.log("RES",res.data.data)
         if (res.data.data) {
           setOrders(res.data.data);
         }
       } catch (err: any) {
         setError(err?.response?.data?.message || err.message || 'Failed to load orders');
       } finally {
-        setLoading(false);
-      }
+        setLoading(false)      }
     };
 
     fetchOrders();

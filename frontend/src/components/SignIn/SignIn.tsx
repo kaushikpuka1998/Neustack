@@ -49,7 +49,7 @@ const SignIn: FC = () => {
           if (user.password) delete user.password;
           if (user.id) localStorage.setItem('userId', String(user.id));
           localStorage.setItem('username', user.name || username);
-          localStorage.setItem('user', JSON.stringify(user));
+          localStorage.setItem('user', user.name);
         }
 
         setSuccess(true);

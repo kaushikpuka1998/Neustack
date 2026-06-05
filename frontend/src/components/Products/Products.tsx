@@ -35,7 +35,7 @@ const Products: FC = () => {
         const res = await api.get('/products');
         if (!mounted) return;
         const data = res.data;
-        console.debug('API Response from /product:', JSON.stringify(data, null, 2));
+        // console.debug('API Response from /product:', JSON.stringify(data, null, 2));
         let productArray: Product[] = [];
         if (data && Array.isArray(data.data)) {
           productArray = data.data;

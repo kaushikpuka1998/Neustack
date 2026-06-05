@@ -39,7 +39,6 @@ const ProductDetail: FC = () => {
         if (!mounted) return;
 
         const data = res.data;
-        console.log('Product Detail Response:', JSON.stringify(data, null, 2));
 
         // Extract product from various possible response formats
         let productData: Product | null = null;
@@ -68,7 +67,6 @@ const ProductDetail: FC = () => {
           setProduct(productData);
         }
       } catch (err: any) {
-        console.error('Error fetching product detail:', err);
         setError(err?.response?.data?.message || err.message || 'Failed to load product details');
       } finally {
         if (mounted) setLoading(false);
@@ -180,7 +178,6 @@ const ProductDetail: FC = () => {
                 window.dispatchEvent(new CustomEvent('cartUpdated', { detail: count }));
                 navigate("/cart");
               } catch (err: any) {
-                console.error('Add to cart error', err);
                 alert(err?.response?.data?.message || err?.message || 'Failed to add to cart');
               }
             }}>

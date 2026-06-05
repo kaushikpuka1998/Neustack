@@ -122,14 +122,14 @@ public class CartService {
         double discount = 0;
         List<Order> orderCount = userRepository.findById(userId).get().getOrders();
         if(!StringUtils.isEmpty(discountCode)){
-            Optional<DiscountCode> activeDiscount = discountService.getActiveDiscount(discountCode);
-            if (activeDiscount.isPresent() && !orderCount.isEmpty() && (orderCount.size() % (activeDiscount.get().getEveryNthOrder()) == 0)) {
-                discount = activeDiscount.map(code -> (double) ((code.getXPercentage()/100))).orElse(0.0);
+            DiscountCode activeDiscount = discountService.getActiveDiscount(discountCode,userId);
+            if ( !orderCount.isEmpty() && (orderCount.size() % (activeDiscount.getEveryNthOrder()) == 0)) {
+                discount = activeDiscount.getXPercentage();
             }
         }
 
         // Calculate final amount
-        double finalAmount = totalAmount - discount*totalAmount;
+        double finalAmount = totalAmount - (discount*totalAmount/100);
         Cart cart = cartInMemoryRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found for user: " + userId));
 
@@ -137,7 +137,7 @@ public class CartService {
 
         for (CartItem cartItem : cart.getCartItems()) {
             if (cartItem.getUserId().equals(userId)) {
-                OrderItem orderItem = new OrderItem(cartItem.getProductId(), cartItem.getQuantity(), cartItem.getPrice(), cartItem.getName(), cartItem.getImgUrl());
+                OrderItem orderItem = new OrderItem(cartItem.getProductId(), cartItem.getQuantity(), cartItem.getPrice() , cartItem.getName(), cartItem.getImgUrl());
                 order.addItem(orderItem);
             }
         }

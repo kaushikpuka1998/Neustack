@@ -2,6 +2,7 @@ package com.kgstrivers.neustack.CONTROLLERS;
 
 import com.kgstrivers.neustack.ENTITIES.ApiResponse;
 import com.kgstrivers.neustack.ENTITIES.DiscountCode;
+import com.kgstrivers.neustack.ENTITIES.DiscountCodeRequest;
 import com.kgstrivers.neustack.ENTITIES.GenerateDiscountCodeRequest;
 import com.kgstrivers.neustack.SERVICES.CartService;
 import com.kgstrivers.neustack.SERVICES.DiscountService;
@@ -42,13 +43,13 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/discount-code/{code}")
-    public ResponseEntity<ApiResponse<DiscountCode>> getDiscountCode(@PathVariable String code) {
+    @PostMapping("/discount-code/")
+    public ResponseEntity<ApiResponse<DiscountCode>> getDiscountCode(@RequestBody DiscountCodeRequest request) {
         try {
-            Optional<DiscountCode> optionalDiscountCode = discountService.getActiveDiscount(code);
-            return optionalDiscountCode.map(discountCode -> new ResponseEntity<>(new ApiResponse<>(true, discountCode), HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(new ApiResponse<>(false, null, "Discount code not found"), HttpStatus.NOT_FOUND));
+            DiscountCode discountCode = discountService.getActiveDiscount( request.getCode(), request.getUserId());
+            return new ResponseEntity<>(new ApiResponse<>(true, discountCode), HttpStatus.OK);
         } catch (Exception e) {
-            String errorMessage = "Error fetching discount code: " + e.getMessage();
+            String errorMessage = e.getMessage();
             return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
