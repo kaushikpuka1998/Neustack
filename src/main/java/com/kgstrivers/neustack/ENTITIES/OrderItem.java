@@ -27,6 +27,5 @@ public class OrderItem {
         this.price = price;
         this.name = name;
         this.imgUrl = imgUrl;
-        this.creationDate = new Date();
     }
 }

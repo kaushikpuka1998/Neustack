@@ -2,6 +2,7 @@
 import {type FC, useEffect, useState} from 'react';
 import { Container, Table, Spinner, Alert } from 'react-bootstrap';
 import {api} from "../../config.ts";
+import {useNavigate} from "react-router-dom";
 
 type Order = {
   id: string;
@@ -9,7 +10,7 @@ type Order = {
   totalAmount: number;
   discountCode?: string;
   finalAmount: number;
-  createdAt: string;
+  createdDate: String;
   items: OrderItem[];
 };
 
@@ -27,6 +28,7 @@ const OrderList: FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userId] = useState<string | null>(localStorage.getItem('userId'));
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -45,6 +47,16 @@ const OrderList: FC = () => {
 
     fetchOrders();
   }, []);
+
+  const handleProductClick = (productId: string) => {
+    navigate(`/products/${productId}`);
+  };
+
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
 
   return (
     <Container className="py-5">
@@ -81,12 +93,12 @@ const OrderList: FC = () => {
                   <td>${(order.totalAmount ?? 0).toFixed(2)}</td>
                   <td>{order.discountCode ?? 'No discount code'}</td>
                   <td>${(order.finalAmount ?? 0).toFixed(2)}</td>
-                  <td>{order.createdAt}</td>
+                  <td>{formatDate(order.createdDate.trim())}</td>
                   <td>
                     {order.items.length > 0 ? (
                         order.items.map((item) => (
-                            <div key={item.productId}>
-                              <img src={item.imgUrl} style={{ width: 80, height: 80, objectFit: 'cover' }} />
+                            <div key={item.productId} onClick={() => handleProductClick(item.productId)}>
+                              <img src={item.imgUrl} style={{ width: 80, height: 80, objectFit: 'cover' , cursor: 'pointer' }} />
                               <strong>Product: </strong>{item.name} &nbsp;
                               <strong>Quantity: </strong>{item.quantity} &nbsp;
                               <strong>Price: </strong>${(item.price ?? 0).toFixed(2)}

@@ -178,16 +178,13 @@ const ProductDetail: FC = () => {
                 }
 
                 window.dispatchEvent(new CustomEvent('cartUpdated', { detail: count }));
-                alert('Added to cart');
+                navigate("/cart");
               } catch (err: any) {
                 console.error('Add to cart error', err);
                 alert(err?.response?.data?.message || err?.message || 'Failed to add to cart');
               }
             }}>
               Add to Cart
-            </Button>
-            <Button variant="outline-secondary" size="lg">
-              Add to Wishlist
             </Button>
           </div>
 

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,9 +17,10 @@ public class Order implements HasId {
     private String id;
     private String userId;
     private double totalAmount;
-    private int discountAmount;
+    private double discountAmount;
     private double finalAmount;
     private String discountCode;
+    private Date createdDate;
     private List<OrderItem> items;
     public void addItem(OrderItem orderItem) {
         items.add(orderItem);

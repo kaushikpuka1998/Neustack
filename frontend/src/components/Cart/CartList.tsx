@@ -96,11 +96,6 @@ const CartList: FC = () => {
     };
 
     const handleCheckout = async () => {
-        if (!discountCode.trim()) {
-            setError('Please enter a discount code');
-            return;
-        }
-
         try {
             // POST /checkout
             const res = await api.post('/checkout', {
@@ -109,7 +104,29 @@ const CartList: FC = () => {
             });
 
             if (res.data.success) {
-                alert(`Order created successfully! Order ID: ${res.data.orderId}`);
+                alert(`Order created successfully! Order ID: ${res.data.data.id}`);
+                setDiscountCode('');
+                fetchCart();
+            } else {
+                setError(res.data.message || 'Failed to create order');
+            }
+        } catch (err: any) {
+            setError(err?.response?.data?.message || err.message || 'Failed to create order');
+        }
+    };
+
+    const validateDiscountCode = async () => {
+        if (!discountCode.trim()) {
+            setError('Please enter a discount code');
+            return;
+        }
+
+        try {
+            // POST /checkout
+            const res = await api.get(`/admin/discount-code/${discountCode}`);
+
+            if (res.data.success) {
+                (`${discountCode} verified, you can get ${res.data.data.xPercentage}% off after every ${res.data.data.everyNthOrder} `);
                 setDiscountCode('');
                 fetchCart();
             } else {
@@ -174,8 +191,11 @@ const CartList: FC = () => {
                             <Form.Label>Discount Code (optional)</Form.Label>
                             <Form.Control type="text" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} />
                         </Form.Group>
+                        <div className="button-container">
+                            <Button variant="primary" onClick={validateDiscountCode}>Validate</Button>
+                            <Button variant="success" onClick={handleCheckout}>Checkout</Button>
+                        </div>
 
-                        <Button variant="primary" onClick={handleCheckout}>Checkout</Button>
                     </div>
                 </>
             )}

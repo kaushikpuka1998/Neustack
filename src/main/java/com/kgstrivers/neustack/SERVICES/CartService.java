@@ -1,10 +1,12 @@
 package com.kgstrivers.neustack.SERVICES;
 
+import ch.qos.logback.core.util.StringUtil;
 import com.kgstrivers.neustack.ENTITIES.*;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.CartInMemoryRepository;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.OrderInMemoryRepository;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.ProductInMemoryRepository;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.UserRepositoryInMemory;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -117,19 +119,21 @@ public class CartService {
         // Calculate total amount
         double totalAmount = calculateTotalPrice(userId);
         // Apply discount if applicable
-        int discount = 0;
+        double discount = 0;
         List<Order> orderCount = userRepository.findById(userId).get().getOrders();
-        Optional<DiscountCode> activeDiscount = discountService.getActiveDiscount(discountCode);
-        if (activeDiscount.isPresent() && !orderCount.isEmpty() && (orderCount.size() % (activeDiscount.get().getEveryNthOrder()) == 0)) {
-            discount = activeDiscount.map(code -> (int) (totalAmount * (1- code.getXPercentage()/100))).orElse(0);
+        if(!StringUtils.isEmpty(discountCode)){
+            Optional<DiscountCode> activeDiscount = discountService.getActiveDiscount(discountCode);
+            if (activeDiscount.isPresent() && !orderCount.isEmpty() && (orderCount.size() % (activeDiscount.get().getEveryNthOrder()) == 0)) {
+                discount = activeDiscount.map(code -> (double) ((code.getXPercentage()/100))).orElse(0.0);
+            }
         }
 
         // Calculate final amount
-        double finalAmount = totalAmount - discount;
+        double finalAmount = totalAmount - discount*totalAmount;
         Cart cart = cartInMemoryRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found for user: " + userId));
 
-        Order order = new Order(UUID.randomUUID().toString(), String.valueOf(userId), totalAmount, discount, finalAmount, discountCode, new ArrayList<>());
+        Order order = new Order(UUID.randomUUID().toString(), String.valueOf(userId), totalAmount, discount, finalAmount, discountCode, new Date(), new ArrayList<>());
 
         for (CartItem cartItem : cart.getCartItems()) {
             if (cartItem.getUserId().equals(userId)) {
