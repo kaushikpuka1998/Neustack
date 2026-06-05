@@ -81,6 +81,27 @@ public class CartService {
         return cartInMemoryRepository.findById(userId);
     }
 
+    public Cart removeProductFromCart(String userId, String productId) {
+        Optional<Cart> cart = cartInMemoryRepository.findById(userId);
+        List<CartItem> cartItems = cart.get().getCartItems();
+
+        if(cartItems.stream().noneMatch(item -> item.getProductId().equals(productId))){
+            throw new RuntimeException("Product not found: " + productId);
+        }
+
+        productService.reduceStock(productId, -cartItems.stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst()
+                .map(CartItem::getQuantity)
+                .orElse(0));
+
+        cartItems.removeIf(item -> item.getProductId().equals(productId));
+
+        cart.get().setCartItems(cartItems);
+        cartInMemoryRepository.save(cart.get());
+        return cart.get();
+    }
+
     public double calculateTotalPrice(String userId) { // Method to calculate total price for the user's cart
         Optional<Cart> cartOpt = cartInMemoryRepository.findById(userId);
         if (cartOpt.isEmpty()) {
@@ -112,7 +133,7 @@ public class CartService {
 
         for (CartItem cartItem : cart.getCartItems()) {
             if (cartItem.getUserId().equals(userId)) {
-                OrderItem orderItem = new OrderItem(cartItem.getProductId(), cartItem.getQuantity(), cartItem.getPrice());
+                OrderItem orderItem = new OrderItem(cartItem.getProductId(), cartItem.getQuantity(), cartItem.getPrice(), cartItem.getName(), cartItem.getImgUrl());
                 order.addItem(orderItem);
             }
         }

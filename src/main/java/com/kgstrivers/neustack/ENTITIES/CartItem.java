@@ -13,6 +13,8 @@ public class CartItem {
     private String cartId; // New field
     private String productId;
     private int quantity;
+    private String name;
+    private String description;
     private String userId;
     private double price; // New field
     private String imgUrl;
@@ -21,6 +23,8 @@ public class CartItem {
         this.id = UUID.randomUUID().toString();
         this.productId = product.getId();  // Assuming productId is derived from the product
         this.quantity = quantity;
+        this.name = product.getName();
+        this.description = product.getDescription();
         this.userId = userId;
         this.cartId = cartId;
         this.imgUrl = product.getImgUrl();
