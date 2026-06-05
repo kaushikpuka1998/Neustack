@@ -15,6 +15,7 @@ public class CartItem {
     private int quantity;
     private String userId;
     private double price; // New field
+    private String imgUrl;
 
     public CartItem(Product product, int quantity, String userId,String cartId) {
         this.id = UUID.randomUUID().toString();
@@ -22,6 +23,7 @@ public class CartItem {
         this.quantity = quantity;
         this.userId = userId;
         this.cartId = cartId;
+        this.imgUrl = product.getImgUrl();
         calculatePrice(quantity, product.getPrice());
     }
 

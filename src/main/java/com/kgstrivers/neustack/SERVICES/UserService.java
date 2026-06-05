@@ -32,6 +32,15 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User findUserName(User user) {
+        return userRepository.findAll().stream().anyMatch(u -> u.getName().equals(user.getName())) ? user : null;
+    }
+
+    public User findUserNameWithPass(String username, String password) {
+        List<User> users = userRepository.findAll();
+        return  users.stream().filter(u1 -> u1.getName().equals(username) && u1.getPassword().equals(password)).findFirst().orElse(null);
+    }
+
     public List<Order> getUserOrders(String userId) {
         return userRepository.findById(userId).get().getOrders();
     }
