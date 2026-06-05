@@ -4,6 +4,15 @@
 
 **Stack:** Java 17 · Spring Boot 4 · Gradle · Lombok · Springdoc OpenAPI (Swagger UI) · React + TypeScript (Vite)
 
+
+## Example:
+<img width="1060" height="885" alt="Screenshot 2026-06-06 at 2 50 52 AM" src="https://github.com/user-attachments/assets/8c4a695e-e470-405a-8c0f-5dcd5b98ca23" />
+<img width="1074" height="574" alt="Screenshot 2026-06-06 at 2 50 00 AM" src="https://github.com/user-attachments/assets/0279ae73-ab9b-4cca-809c-d60937d25fcf" />
+<img width="1113" height="784" alt="Screenshot 2026-06-06 at 2 49 46 AM" src="https://github.com/user-attachments/assets/5cead476-08bf-4464-95d6-2b2d4667896e" />
+<img width="1590" height="748" alt="Screenshot 2026-06-06 at 2 47 29 AM" src="https://github.com/user-attachments/assets/4154bb87-3b98-4b24-8e26-b56eae02033e" />
+<img width="1733" height="872" alt="Screenshot 2026-06-06 at 2 47 17 AM" src="https://github.com/user-attachments/assets/166632f8-2569-45ca-ba9d-8696c203f23d" />
+
+
 ---
 
 ## Table of Contents
