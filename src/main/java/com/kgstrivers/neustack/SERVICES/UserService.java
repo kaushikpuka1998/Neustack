@@ -26,7 +26,19 @@ public class UserService {
     }
 
     public User addUser(User user) {
+        if(userRepository.findAll().stream().anyMatch(u -> u.getName().equals(user.getName()))) {
+            throw new RuntimeException("User with id " + user.getName() + " already exists");
+        }
         return userRepository.save(user);
+    }
+
+    public User findUserName(User user) {
+        return userRepository.findAll().stream().anyMatch(u -> u.getName().equals(user.getName())) ? user : null;
+    }
+
+    public User findUserNameWithPass(String username, String password) {
+        List<User> users = userRepository.findAll();
+        return  users.stream().filter(u1 -> u1.getName().equals(username) && u1.getPassword().equals(password)).findFirst().orElse(null);
     }
 
     public List<Order> getUserOrders(String userId) {

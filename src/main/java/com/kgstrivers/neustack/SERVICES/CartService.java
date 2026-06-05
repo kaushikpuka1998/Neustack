@@ -1,10 +1,12 @@
 package com.kgstrivers.neustack.SERVICES;
 
+import ch.qos.logback.core.util.StringUtil;
 import com.kgstrivers.neustack.ENTITIES.*;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.CartInMemoryRepository;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.OrderInMemoryRepository;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.ProductInMemoryRepository;
 import com.kgstrivers.neustack.REPOSITORIES.CUSTOMREPOSITORIES.UserRepositoryInMemory;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,6 +83,27 @@ public class CartService {
         return cartInMemoryRepository.findById(userId);
     }
 
+    public Cart removeProductFromCart(String userId, String productId) {
+        Optional<Cart> cart = cartInMemoryRepository.findById(userId);
+        List<CartItem> cartItems = cart.get().getCartItems();
+
+        if(cartItems.stream().noneMatch(item -> item.getProductId().equals(productId))){
+            throw new RuntimeException("Product not found: " + productId);
+        }
+
+        productService.reduceStock(productId, -cartItems.stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst()
+                .map(CartItem::getQuantity)
+                .orElse(0));
+
+        cartItems.removeIf(item -> item.getProductId().equals(productId));
+
+        cart.get().setCartItems(cartItems);
+        cartInMemoryRepository.save(cart.get());
+        return cart.get();
+    }
+
     public double calculateTotalPrice(String userId) { // Method to calculate total price for the user's cart
         Optional<Cart> cartOpt = cartInMemoryRepository.findById(userId);
         if (cartOpt.isEmpty()) {
@@ -96,23 +119,25 @@ public class CartService {
         // Calculate total amount
         double totalAmount = calculateTotalPrice(userId);
         // Apply discount if applicable
-        int discount = 0;
+        double discount = 0;
         List<Order> orderCount = userRepository.findById(userId).get().getOrders();
-        Optional<DiscountCode> activeDiscount = discountService.getActiveDiscount(discountCode);
-        if (activeDiscount.isPresent() && !orderCount.isEmpty() && (orderCount.size() % (activeDiscount.get().getEveryNthOrder()) == 0)) {
-            discount = activeDiscount.map(code -> (int) (totalAmount * (1- code.getXPercentage()/100))).orElse(0);
+        if(!StringUtils.isEmpty(discountCode)){
+            DiscountCode activeDiscount = discountService.getActiveDiscount(discountCode,userId);
+            if ( !orderCount.isEmpty() && (orderCount.size() % (activeDiscount.getEveryNthOrder()) == 0)) {
+                discount = activeDiscount.getXPercentage();
+            }
         }
 
         // Calculate final amount
-        double finalAmount = totalAmount - discount;
+        double finalAmount = totalAmount - (discount*totalAmount/100);
         Cart cart = cartInMemoryRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found for user: " + userId));
 
-        Order order = new Order(UUID.randomUUID().toString(), String.valueOf(userId), totalAmount, discount, finalAmount, discountCode, new ArrayList<>());
+        Order order = new Order(UUID.randomUUID().toString(), String.valueOf(userId), totalAmount, discount, finalAmount, discountCode, new Date(), new ArrayList<>());
 
         for (CartItem cartItem : cart.getCartItems()) {
             if (cartItem.getUserId().equals(userId)) {
-                OrderItem orderItem = new OrderItem(cartItem.getProductId(), cartItem.getQuantity(), cartItem.getPrice());
+                OrderItem orderItem = new OrderItem(cartItem.getProductId(), cartItem.getQuantity(), cartItem.getPrice() , cartItem.getName(), cartItem.getImgUrl());
                 order.addItem(orderItem);
             }
         }

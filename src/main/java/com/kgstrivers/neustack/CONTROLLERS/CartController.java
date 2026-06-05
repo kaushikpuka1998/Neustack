@@ -1,9 +1,6 @@
 package com.kgstrivers.neustack.CONTROLLERS;
 
-import com.kgstrivers.neustack.ENTITIES.AddCartItemRequest;
-import com.kgstrivers.neustack.ENTITIES.ApiResponse;
-import com.kgstrivers.neustack.ENTITIES.Cart;
-import com.kgstrivers.neustack.ENTITIES.CartItem;
+import com.kgstrivers.neustack.ENTITIES.*;
 import com.kgstrivers.neustack.SERVICES.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,6 +32,20 @@ public class CartController {
     public ResponseEntity<ApiResponse<List<CartItem>>> getCartItems(@PathVariable String userId) {
         try {
             Optional<Cart> cart = cartService.getCartList(userId);
+            if (ObjectUtils.isEmpty(cart)) {
+                return new ResponseEntity<>(new ApiResponse<>(false, null, "No items in cart"), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(new ApiResponse<>(true, cart.get().getCartItems()), HttpStatus.OK);
+        } catch (Exception e) {
+            String errorMessage = "Error fetching cart items: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/remove")
+    public ResponseEntity<ApiResponse<List<CartItem>>> getCartItems(@RequestBody RemoveProductFromCartRequest request) {
+        try {
+            Optional<Cart> cart = Optional.of(cartService.removeProductFromCart(request.getCartId(),  request.getProductId()));
             if (ObjectUtils.isEmpty(cart)) {
                 return new ResponseEntity<>(new ApiResponse<>(false, null, "No items in cart"), HttpStatus.NOT_FOUND);
             }

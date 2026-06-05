@@ -1,6 +1,7 @@
 package com.kgstrivers.neustack.CONTROLLERS;
 
 import com.kgstrivers.neustack.ENTITIES.ApiResponse;
+import com.kgstrivers.neustack.ENTITIES.LoginRequest;
 import com.kgstrivers.neustack.ENTITIES.Order;
 import com.kgstrivers.neustack.ENTITIES.User;
 import com.kgstrivers.neustack.SERVICES.UserService;
@@ -27,6 +28,44 @@ public class UserController {
             return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/check-username")
+    public ResponseEntity<ApiResponse<Boolean>> checkUsername(@RequestBody User user) {
+        try {
+            // findUserName should return a User if the username exists, otherwise null
+            User found = userService.findUserName(user);
+
+            // If found == null => username is available
+            if (found == null) {
+                return new ResponseEntity<>(new ApiResponse<>(true, true, "Username available"), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ApiResponse<>(true, false, "Username already taken"), HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            String errorMessage = "Error checking username: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, false, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<User>> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            User u = userService.findUserNameWithPass(loginRequest.getUsername(), loginRequest.getPassword());
+            if(u==null){
+                return new ResponseEntity<>(new ApiResponse<>(true, null,"User Not Found!"), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            else{
+                return new ResponseEntity<>(new ApiResponse<>(true, u), HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            String errorMessage = "Error adding user: " + e.getMessage();
+            return new ResponseEntity<>(new ApiResponse<>(false, null, errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
 
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<User>> getUser(@PathVariable String userId) {
