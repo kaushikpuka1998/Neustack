@@ -4,6 +4,8 @@
 
 **Stack:** Java 17 · Spring Boot 4 · Gradle · Lombok · Springdoc OpenAPI (Swagger UI) · React + TypeScript (Vite)
 
+Postman : [https://documenter.getpostman.com/view/9556363/2sBXwqqW77](url)
+
 
 ## Example:
 <img width="1060" height="885" alt="Screenshot 2026-06-06 at 2 50 52 AM" src="https://github.com/user-attachments/assets/8c4a695e-e470-405a-8c0f-5dcd5b98ca23" />
