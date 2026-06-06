@@ -4,7 +4,7 @@
 
 **Stack:** Java 17 · Spring Boot 4 · Gradle · Lombok · Springdoc OpenAPI (Swagger UI) · React + TypeScript (Vite)
 
-Postman : [https://documenter.getpostman.com/view/9556363/2sBXwqqW77](url)
+Postman : https://documenter.getpostman.com/view/9556363/2sBXwqqW77
 
 
 ## Example:
