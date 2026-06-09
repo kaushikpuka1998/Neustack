@@ -22,18 +22,20 @@ The assignment explicitly states "use what lets you demonstrate your skills best
 
 ---
 
-## Decision 2: In-Memory Store — ConcurrentHashMap + AtomicInteger over Plain HashMap
+## Decision 2: In-Memory Store — ConcurrentHashMap over Plain HashMap
 
 **Context:**
-The spec says no database is needed. I didn't us any Thread, in-memory data structure for carts, orders, and discount codes.
+The assignment required an in-memory solution without a database. Application data such as carts, orders, and discount codes are stored in memory.
 
 **Options Considered:**
-- **Option A — Plain `HashMap`:** Simplest to write. But REST APIs are served on a thread pool — concurrent checkout requests could corrupt shared state (e.g., two threads reading order count as 9 simultaneously, both triggering the 10th-order coupon).
-- **Option B — `ConcurrentHashMap` + `AtomicInteger` for counters:** Thread-safe without explicit locking. Atomic compare-and-swap operations on order count prevent double-trigger of the discount condition.
+- **Option A — Plain HashMap: Simple implementation, but not safe for concurrent access in a multi-threaded Spring Boot application.
+- **Option B — `ConcurrentHashMap`: Provides thread-safe access to shared in-memory data structures without requiring explicit synchronization.
 - **Option C — Embedded H2 database:** Persistent and transactional, but the spec explicitly says in-memory is fine and a database is not needed. Overkill for an assignment.
 
 **Choice:** Option B
 
+**Why:**
+Used  `ConcurrentHashMap` to safely manage shared application state in memory. Since the application serves requests concurrently, ConcurrentHashMap helps prevent data corruption while keeping the implementation lightweight and aligned with the assignment requirements.
 
 ---
 
@@ -84,24 +86,20 @@ The most critical logic in this assignment — the Nth-order counter check, coup
 
 ---
 
-## Decision 6: Discount Percentage and N-Value — Configurable via application.properties
+## Decision 6: Discount Percentage and N-Value — Configurable via api service
 
 **Context:**
 The assignment specifies "every Nth order gets x% discount" but does not fix the values of N or x. I needed to decide whether to hardcode them or make them configurable.
 
 **Options Considered:**
 - **Option A — Hardcoded values:** Faster to write, but any change to the discount policy requires a code change and recompile.
-- **Option B — Externalized to `application.properties`:** Values injected at startup via `@Value("${discount.nth-order}")` and `@Value("${discount.percentage}")`.
+- **Option B — Externalized to API Controller.
 
-**Choice:** Option B — externalized configuration
+**Choice:** Option B — Externalized to API Controller
 
 **Why:**
-This is a standard Spring Boot pattern for environment-specific or policy-level configuration. It allows the discount policy to be changed without touching code — important because discount rules are business decisions, not engineering ones. It also makes the system easier to test with different N values by overriding properties in test context.
+Discount configuration is externalized to a dedicated API service, allowing discount rules and code generation policies to be managed centrally without requiring application redeployment. This ensures consistency, flexibility, and a single source of truth across all consuming services.
 
-```properties
-discount.nth-order=5
-discount.percentage=10
-```
 
 ---
 
@@ -129,5 +127,5 @@ Swagger UI is automatically available at `http://localhost:8080/swagger-ui/index
 | 2 | Coupon generation trigger | Admin-triggered via dedicated endpoint |
 | 3 |Code structure | Controller → Service → Store layering |
 | 4 | Code structure | Controller → Service → Store layering |
-| 5 | Discount config (N, x%) | Externalized to `application.properties` |
+| 5 | Discount config (N, x%) | Externalized to exposed by API |
 | 6 | API documentation | Swagger UI via Springdoc OpenAPI |
