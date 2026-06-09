@@ -46,7 +46,7 @@ Every Nth order is eligible for a coupon. The question was: should the system au
 
 **Options Considered:**
 - **Option A — Auto-generate at checkout:** When the Nth order completes, automatically generate and return a coupon code inline. Simpler UX, but tightly couples the checkout flow with the discount issuance logic.
-- **Option B — Admin-triggered via a dedicated endpoint (`POST /api/admin/discount/generate`):** Admin checks if the condition is met and explicitly generates the code. The assignment spec explicitly calls for this admin API.
+- **Option B — Admin-triggered via a dedicated endpoint (`POST /admin/generate-discount-code`):** Admin checks if the condition is met and explicitly generates the code. The assignment spec explicitly calls for this admin API.
 
 **Choice:** Option B — Admin-triggered generation
 
