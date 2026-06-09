@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
 @RequiredArgsConstructor

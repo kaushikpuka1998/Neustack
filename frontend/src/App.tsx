@@ -11,7 +11,7 @@ import Header from "./components/Header/Header";
 
 function App() {
 
-    const isLoggedIn = !!localStorage.getItem("userId");
+    const isLoggedIn = !!localStorage.getItem("userId") || !!localStorage.getItem("userId");
     return (
         <>
             <Header/>
