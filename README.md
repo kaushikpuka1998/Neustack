@@ -1,6 +1,6 @@
 # Neustack — E-Commerce Store API
 
-> A take-home assignment: e-commerce backend with cart management, checkout, discount system, user management, and product catalogue — all in-memory, no database needed.
+> E-commerce backend with cart management, checkout, discount system, user management, and product catalogue — all in-memory, no database needed.
 
 **Stack:** Java 17 · Spring Boot 4 · Gradle · Lombok · Springdoc OpenAPI (Swagger UI) · React + TypeScript (Vite)
 
